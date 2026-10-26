@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f1dcbc">
+  <title>Kippensoep</title>
+  <meta name="description" content="Een kom kippensoep: haal hem dichterbij, blaas erin en kijk hoe de soep door de kom stroomt.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E%F0%9F%8D%B2%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="scene" aria-label="Een kom kippensoep die je vasthoudt"></canvas>
+
+  <header class="top">
+    <h1>Kippensoep</h1>
+    <p id="hint" aria-live="polite">Haal de kom dichterbij om erin te kunnen blazen.</p>
+  </header>
+
+  <div id="legend" class="legend" hidden>
+    <span><i class="dot red"></i> Rood: stroming van de soep</span>
+    <span><i class="dot blue"></i> Blauw: blaasplek</span>
+  </div>
+
+  <footer id="panel" class="panel">
+    <button id="btn-near" class="btn btn-primary" type="button" aria-pressed="false">Dichterbij houden</button>
+    <button id="btn-blow" class="btn btn-blow" type="button" disabled>Blazen</button>
+    <label class="switch">
+      <input id="toggle-flow" type="checkbox">
+      <span class="track" aria-hidden="true"></span>
+      <span class="label">Toon stroming</span>
+    </label>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
