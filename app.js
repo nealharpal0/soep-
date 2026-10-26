@@ -39,7 +39,7 @@
   const BLOW = { x: 0, y: -0.3 };    // blaasplek in soep-ruimte
 
   // ---------------------------------------------------------------- stroming
-  const V0 = 0.8; // eenheden per seconde bij volle kracht
+  const V0 = 1.25; // eenheden per seconde bij volle kracht
   const field = (x, y) => [2 * x * y, 1 - 3 * x * x - y * y];
 
   // ---------------------------------------------------------------- toestand
@@ -88,7 +88,7 @@
     mk(leeks, 12, 0.8, () => ({ r: rr(0.055, 0.075), drag: 0.85 }));
     mk(celery, 7, 0.8, () => ({ r: rr(0.1, 0.13), drag: 0.8 }));
     mk(parsley, 38, 0.9, () => ({ r: rr(0.018, 0.03), drag: 1.05, tone: rnd() }));
-    mk(foam, 220, 0.95, () => ({ drag: 1.1, trail: [] }));
+    mk(foam, 420, 0.95, () => ({ drag: 1.1, trail: [] }));
     mk(eyes, 320, 0.97, () => ({ r: rnd() < 0.06 ? rr(0.024, 0.04) : rr(0.007, 0.02), drag: 1.05 }));
     big.push(...carrots, ...chicken, ...leeks, ...celery);
     for (let i = 0; i < 80; i++) separate(1);
@@ -238,7 +238,7 @@
     p.x += f2[0] * k * dt;
     p.y += f2[1] * k * dt;
     // extra kracht van de adem: een duidelijke straal recht door het midden
-    p.y += 0.9 * k * dt * Math.exp(-p.x * p.x / 0.03) * Math.exp(-Math.pow(p.y + 0.1, 2) / 0.7);
+    p.y += 1.5 * k * dt * Math.exp(-p.x * p.x / 0.035) * Math.exp(-Math.pow(p.y + 0.1, 2) / 0.7);
     // ruis, zodat niets blijft hangen bij de stilstandspunten voor en achter
     const n = noiseAmt * (0.12 + s);
     p.x += n * dt * (Math.sin(3.7 * p.y + 1.3 * clock + p.ph) + 0.6 * Math.sin(7.1 * p.x - 0.9 * clock + p.ph * 2.3));
@@ -304,7 +304,7 @@
     for (const p of eyes) { advect(p, dt, s, 0.07); keepInside(p, 0.965); }
     for (const p of foam) {
       advect(p, dt, s, 0.05); keepInside(p, 0.96);
-      if (s > 0.03) { p.trail.push(p.x, p.y); if (p.trail.length > 36) p.trail.splice(0, 2); }
+      if (s > 0.03) { p.trail.push(p.x, p.y); if (p.trail.length > 52) p.trail.splice(0, 2); }
       else if (p.trail.length) p.trail.splice(0, 2);
     }
     for (const p of noodles) {
@@ -327,7 +327,7 @@
     if (breathStrength > 0.35) {
       rippleTimer -= dt;
       if (rippleTimer <= 0) {
-        rippleTimer = 0.07;
+        rippleTimer = 0.05;
         ripples.push({ x: BLOW.x + rr(-0.06, 0.06), y: BLOW.y + rr(-0.06, 0.06), age: 0, life: rr(1.1, 1.7), amp: rr(0.6, 1) });
       }
     }
@@ -361,7 +361,7 @@
         const dx = p.x - B.x, dy = p.y - B.y, d = Math.hypot(dx, dy) + 1e-3;
         const reach = g.R * 1.15;
         if (d < reach) {
-          const f = (1 - d / reach) * breathStrength * g.R * 2.6;
+          const f = (1 - d / reach) * breathStrength * g.R * 3.6;
           p.vx += (dx / d) * f * dt * 3;
           p.vy += ((dy / d) * 0.6 - 0.9) * f * dt * 3;
         }
@@ -727,18 +727,61 @@
       ctx.restore();
     }
 
-    // schuimstrepen: laten de rondgaande stroming goed zien
+    // wervels: draaiende spiraalarmen in de twee wervelcentra (links tegen de klok in, rechts met de klok mee)
     if (flowStrength > 0.03) {
-      ctx.globalAlpha = Math.min(1, flowStrength * 1.1) * 0.75;
-      ctx.strokeStyle = 'rgba(255,251,230,1)'; ctx.lineWidth = 0.008; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      ctx.beginPath();
-      for (const p of foam) {
-        const t = p.trail;
-        if (t.length < 6) continue;
-        ctx.moveTo(t[0], -t[1] * k + bob);
-        for (let i = 2; i < t.length; i += 2) ctx.lineTo(t[i], -t[i + 1] * k + bob);
+      const sS = Math.min(1, flowStrength);
+      for (const side of [-1, 1]) {
+        const cx = side * 0.577, dir = -side; // links (side -1) = +1 = tegen de klok in
+        const base = dir * clock * (1.5 + 5 * sS);
+        const dg = ctx.createRadialGradient(cx, 0, 0, cx, 0, 0.3);
+        dg.addColorStop(0, `rgba(120,60,5,${0.3 * sS})`);
+        dg.addColorStop(1, 'rgba(120,60,5,0)');
+        ctx.save(); ctx.translate(0, 0); ctx.scale(1, 1);
+        ctx.fillStyle = dg;
+        ctx.beginPath(); ctx.ellipse(cx, 0, 0.3, 0.3 * k, 0, 0, TAU); ctx.fill();
+        ctx.lineCap = 'round';
+        for (let arm = 0; arm < 3; arm++) {
+          ctx.beginPath();
+          for (let i = 0; i <= 24; i++) {
+            const u = i / 24, ang = base + arm * TAU / 3 + dir * u * 4.2, r = 0.03 + 0.26 * u;
+            const X = cx + Math.cos(ang) * r, Y = -Math.sin(ang) * r * k;
+            if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+          }
+          ctx.strokeStyle = `rgba(110,55,5,${0.3 * sS})`; ctx.lineWidth = 0.02; ctx.stroke();
+          ctx.strokeStyle = `rgba(255,246,205,${0.45 * sS})`; ctx.lineWidth = 0.007; ctx.stroke();
+        }
+        ctx.restore();
       }
-      ctx.stroke();
+      // gloed van de blaasstraal door het midden
+      ctx.save();
+      ctx.translate(0, -0.1 * k); ctx.scale(0.16, 0.8 * k);
+      const jg = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+      jg.addColorStop(0, `rgba(255,248,215,${0.42 * sS})`);
+      jg.addColorStop(1, 'rgba(255,248,215,0)');
+      ctx.fillStyle = jg; ctx.beginPath(); ctx.arc(0, 0, 1, 0, TAU); ctx.fill();
+      ctx.restore();
+    }
+
+    // schuimstrepen: laten de rondgaande stroming goed zien (snel = helder en dik)
+    if (flowStrength > 0.03) {
+      const sS = Math.min(1, flowStrength);
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      for (let pass = 0; pass < 2; pass++) {
+        ctx.beginPath();
+        for (const p of foam) {
+          const t = p.trail;
+          if (t.length < 6) continue;
+          const n = t.length;
+          const sp = Math.hypot(t[n - 2] - t[n - 6], t[n - 1] - t[n - 5]);
+          if ((sp > 0.035) !== (pass === 1)) continue;
+          ctx.moveTo(t[0], -t[1] * k + bob);
+          for (let i = 2; i < n; i += 2) ctx.lineTo(t[i], -t[i + 1] * k + bob);
+        }
+        ctx.globalAlpha = sS * (pass ? 0.78 : 0.42);
+        ctx.strokeStyle = pass ? 'rgba(255,253,238,1)' : 'rgba(255,246,215,1)';
+        ctx.lineWidth = pass ? 0.01 : 0.006;
+        ctx.stroke();
+      }
       ctx.globalAlpha = 1;
     }
 
@@ -757,7 +800,7 @@
 
     // rimpelingen
     for (const r of ripples) {
-      const t = r.age / r.life, rad = 0.03 + t * 0.34;
+      const t = r.age / r.life, rad = 0.03 + t * 0.5;
       const a = (1 - t) * 0.55 * r.amp;
       ctx.beginPath(); ctx.ellipse(r.x, -r.y * k, rad, rad * k, 0, 0, TAU);
       ctx.strokeStyle = `rgba(255,248,215,${a})`; ctx.lineWidth = 0.011; ctx.stroke();
