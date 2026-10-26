@@ -56,7 +56,9 @@
   const breath = [];
 
   // ---------------------------------------------------------------- ingrediënten
-  const eyes = [], noodles = [], carrots = [], chicken = [], leeks = [], celery = [], parsley = [];
+  const eyes = [], noodles = [], carrots = [], croutons = [], chicken = [], leeks = [], celery = [], parsley = [], pepper = [];
+  let soup = 'kip';                  // 'kip' of 'tomaat'
+  const seeds = {};
   const big = []; // alle grote stukken, voor onderlinge afstoting
 
   function randomInDisc(rmax) {
@@ -75,21 +77,35 @@
     return pts;
   }
 
-  function buildSoup() {
+  function buildSoup(kind) {
+    for (const arr of [noodles, carrots, croutons, chicken, leeks, celery, parsley, pepper, eyes, big]) arr.length = 0;
+    if (!seeds.kip) seeds.kip = seed;
+    if (!seeds.tomaat) seeds.tomaat = 777123;
+    seed = seeds[kind];
     const mk = (arr, n, rmax, props) => {
       for (let i = 0; i < n; i++) {
         const p = randomInDisc(rmax);
         arr.push(Object.assign({ x: p.x, y: p.y, th: rr(0, TAU), ph: rr(0, TAU) }, props(i)));
       }
     };
-    mk(noodles, 120, 0.9, () => ({ len: rr(0.2, 0.42), drag: 0.95, bend: rr(0.6, 1.4), c: rnd() }));
-    mk(carrots, 12, 0.78, () => ({ r: rr(0.075, 0.095), drag: 0.8 }));
-    mk(chicken, 6, 0.7, () => { const r = rr(0.12, 0.16); return { r, drag: 0.65, shape: blobShape(r), tone: rnd() }; });
-    mk(leeks, 12, 0.8, () => ({ r: rr(0.055, 0.075), drag: 0.85 }));
-    mk(celery, 7, 0.8, () => ({ r: rr(0.1, 0.13), drag: 0.8 }));
-    mk(parsley, 38, 0.9, () => ({ r: rr(0.018, 0.03), drag: 1.05, tone: rnd() }));
-    mk(eyes, 320, 0.97, () => ({ r: rnd() < 0.06 ? rr(0.024, 0.04) : rr(0.007, 0.02), drag: 1.05 }));
-    big.push(...carrots, ...chicken, ...leeks, ...celery);
+    if (kind === 'kip') {
+      mk(noodles, 120, 0.9, () => ({ len: rr(0.2, 0.42), drag: 0.95, bend: rr(0.6, 1.4), c: rnd() }));
+      mk(carrots, 12, 0.78, () => ({ r: rr(0.075, 0.095), drag: 0.8 }));
+      mk(chicken, 6, 0.7, () => { const r = rr(0.12, 0.16); return { r, drag: 0.65, shape: blobShape(r), tone: rnd() }; });
+      mk(leeks, 12, 0.8, () => ({ r: rr(0.055, 0.075), drag: 0.85 }));
+      mk(celery, 7, 0.8, () => ({ r: rr(0.1, 0.13), drag: 0.8 }));
+      mk(parsley, 38, 0.9, () => ({ r: rr(0.018, 0.03), drag: 1.05, tone: rnd() }));
+      mk(eyes, 320, 0.97, () => ({ r: rnd() < 0.06 ? rr(0.024, 0.04) : rr(0.007, 0.02), drag: 1.05 }));
+    } else {
+      // tomatensoep: roomstrepen, tomatenstukjes, croutons, basilicum, peper en olie-oogjes
+      mk(noodles, 50, 0.9, () => ({ len: rr(0.32, 0.6), drag: 0.95, bend: rr(0.6, 1.4), c: rnd() }));
+      mk(chicken, 9, 0.7, () => { const r = rr(0.075, 0.115); return { r, drag: 0.7, shape: blobShape(r), tone: rnd() }; });
+      mk(croutons, 10, 0.75, () => ({ r: rr(0.05, 0.065), drag: 0.8 }));
+      mk(parsley, 20, 0.88, () => ({ r: rr(0.04, 0.058), drag: 0.95, tone: rnd() }));
+      mk(pepper, 90, 0.95, () => ({ r: rr(0.005, 0.011), drag: 1.0 }));
+      mk(eyes, 260, 0.97, () => ({ r: rnd() < 0.06 ? rr(0.022, 0.036) : rr(0.007, 0.018), drag: 1.05 }));
+    }
+    big.push(...carrots, ...croutons, ...chicken, ...leeks, ...celery);
     for (let i = 0; i < 80; i++) separate(1);
   }
 
@@ -139,20 +155,23 @@
     return c;
   }
 
-  function makeTextTexture() {
+  function makeTextTexture(kind) {
     const c = document.createElement('canvas');
     c.width = 640; c.height = 280;
     const g = c.getContext('2d');
     g.fillStyle = '#0e0c0b';
     g.textBaseline = 'middle';
     g.textAlign = 'center';
-    g.font = 'italic 700 250px "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif';
+    const fam = '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif';
     g.save();
     g.translate(320, 150); g.rotate(-0.07);
-    g.fillText('Soep', 0, 0);
+    g.font = `italic 700 ${kind === 'tomaat' ? 190 : 250}px ${fam}`;
+    g.fillText(kind === 'tomaat' ? 'Tomaat' : 'Soep', 0, 0);
     g.restore();
-    g.font = 'italic 700 74px "Palatino Linotype", Palatino, Georgia, serif';
-    g.save(); g.translate(86, 238); g.rotate(-0.12); g.fillText('kip', 0, 0); g.restore();
+    if (kind !== 'tomaat') {
+      g.font = `italic 700 74px ${fam}`;
+      g.save(); g.translate(86, 238); g.rotate(-0.12); g.fillText('kip', 0, 0); g.restore();
+    }
     return c;
   }
 
@@ -218,7 +237,7 @@
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     panelH = panel.getBoundingClientRect().height;
     document.documentElement.style.setProperty('--panel-h', panelH + 'px');
-    const top = 58;
+    const top = 96;
     const aH = Math.max(200, H - panelH - top);
     const R1 = Math.min(W * 0.455, aH * 0.43);
     L = {
@@ -303,7 +322,8 @@
       const f = advect(p, dt, s, 0.08); keepInside(p, 0.88);
       spinAndAlign(p, f, dt, s, 0.9);
     }
-    for (const arr of [carrots, chicken, leeks, celery]) {
+    for (const p of pepper) { advect(p, dt, s, 0.06); keepInside(p, 0.96); }
+    for (const arr of [carrots, croutons, chicken, leeks, celery]) {
       for (const p of arr) {
         const f = advect(p, dt, s, 0.05); keepInside(p, 0.9 - p.r);
         spinAndAlign(p, f, dt, s, 0.5);
@@ -575,10 +595,13 @@
     ctx.save();
     ctx.scale(1, k);
     const sg = ctx.createRadialGradient(-0.1, -0.2, 0, 0, 0, 1.08);
-    sg.addColorStop(0, '#f6c85a');
-    sg.addColorStop(0.5, '#eeb03e');
-    sg.addColorStop(0.85, '#dc9328');
-    sg.addColorStop(1, '#b97119');
+    const broth = soup === 'tomaat'
+      ? ['#ee7048', '#e0502d', '#c63b22', '#8f2614']
+      : ['#f6c85a', '#eeb03e', '#dc9328', '#b97119'];
+    sg.addColorStop(0, broth[0]);
+    sg.addColorStop(0.5, broth[1]);
+    sg.addColorStop(0.85, broth[2]);
+    sg.addColorStop(1, broth[3]);
     ctx.fillStyle = sg; ctx.fillRect(-1.2, -1.2, 2.4, 2.4);
     ctx.restore();
 
@@ -596,7 +619,7 @@
 
     const bob = Math.sin(clock * 1.7) * 0.004;
 
-    // vermicelli
+    // vermicelli (kip) of roomstrepen (tomaat)
     const strokeNoodles = (width, style, off) => {
       ctx.beginPath();
       for (const n of noodles) {
@@ -614,9 +637,15 @@
       ctx.lineWidth = width; ctx.strokeStyle = style; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       ctx.stroke();
     };
-    strokeNoodles(0.02, 'rgba(150,88,14,0.5)', 0.012);
-    strokeNoodles(0.013, '#f6df92', 0);
-    strokeNoodles(0.005, 'rgba(255,248,215,0.75)', -0.003);
+    if (soup === 'tomaat') {
+      strokeNoodles(0.05, 'rgba(110,25,10,0.22)', 0.014);
+      strokeNoodles(0.038, 'rgba(255,236,218,0.4)', 0);
+      strokeNoodles(0.016, 'rgba(255,250,244,0.62)', -0.004);
+    } else {
+      strokeNoodles(0.02, 'rgba(150,88,14,0.5)', 0.012);
+      strokeNoodles(0.013, '#f6df92', 0);
+      strokeNoodles(0.005, 'rgba(255,248,215,0.75)', -0.003);
+    }
 
     // wortelplakjes
     for (const c of carrots) {
@@ -638,6 +667,25 @@
         ctx.lineTo(Math.cos(a) * c.r * 0.55, Math.sin(a) * c.r * 0.55);
         ctx.strokeStyle = 'rgba(255,225,160,0.4)'; ctx.lineWidth = c.r * 0.04; ctx.stroke();
       }
+      ctx.restore();
+    }
+
+    // croutons
+    for (const c of croutons) {
+      const X = c.x, Y = -c.y * k + bob;
+      const rect = (r) => { ctx.beginPath(); ctx.roundRect(-r, -r, r * 2, r * 2, r * 0.3); };
+      ctx.save();
+      ctx.translate(X, Y + 0.025); ctx.scale(1, -k); ctx.rotate(c.th);
+      ctx.fillStyle = '#8a5a22'; rect(c.r); ctx.fill();
+      ctx.restore();
+      ctx.save();
+      ctx.translate(X, Y); ctx.scale(1, -k); ctx.rotate(c.th);
+      const cg = ctx.createLinearGradient(-c.r, -c.r, c.r, c.r);
+      cg.addColorStop(0, '#f1cf85'); cg.addColorStop(0.6, '#e2ab52'); cg.addColorStop(1, '#c98a38');
+      ctx.fillStyle = cg; rect(c.r); ctx.fill();
+      ctx.strokeStyle = 'rgba(140,85,25,0.7)'; ctx.lineWidth = 0.008; ctx.stroke();
+      ctx.fillStyle = 'rgba(150,90,30,0.45)';
+      for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.arc(((i * 37) % 11 - 5) * c.r * 0.14, ((i * 53) % 11 - 5) * c.r * 0.14, c.r * 0.07, 0, TAU); ctx.fill(); }
       ctx.restore();
     }
 
@@ -669,7 +717,7 @@
       ctx.restore();
     }
 
-    // kip
+    // kip (kip) of tomatenstukjes (tomaat)
     for (const c of chicken) {
       const X = c.x, Y = -c.y * k + bob;
       const path = () => {
@@ -685,28 +733,61 @@
       };
       ctx.save();
       ctx.translate(X, Y + 0.03); ctx.scale(1, -k); ctx.rotate(c.th);
-      ctx.fillStyle = '#a97c45'; path(); ctx.fill();
+      ctx.fillStyle = soup === 'tomaat' ? '#8a2112' : '#a97c45'; path(); ctx.fill();
       ctx.restore();
       ctx.save();
       ctx.translate(X, Y); ctx.scale(1, -k); ctx.rotate(c.th);
       const cg = ctx.createLinearGradient(-c.r, c.r, c.r, -c.r);
-      cg.addColorStop(0, c.tone > 0.5 ? '#e6c999' : '#e9d0a4');
-      cg.addColorStop(0.5, '#f4e2c0');
-      cg.addColorStop(1, '#ecd3a6');
-      ctx.fillStyle = cg; path(); ctx.fill();
-      ctx.strokeStyle = 'rgba(160,115,60,0.7)'; ctx.lineWidth = 0.012; ctx.stroke();
-      ctx.clip();
-      ctx.strokeStyle = 'rgba(170,125,70,0.4)'; ctx.lineWidth = 0.008;
-      for (let i = -3; i <= 3; i++) {
-        ctx.beginPath(); ctx.moveTo(-c.r * 1.2, i * c.r * 0.28 - c.r * 0.15); ctx.quadraticCurveTo(0, i * c.r * 0.28 + c.r * 0.1, c.r * 1.2, i * c.r * 0.28 - c.r * 0.05); ctx.stroke();
+      if (soup === 'tomaat') {
+        cg.addColorStop(0, '#e44a30'); cg.addColorStop(0.5, '#f26a4a'); cg.addColorStop(1, '#cf3722');
+      } else {
+        cg.addColorStop(0, c.tone > 0.5 ? '#e6c999' : '#e9d0a4');
+        cg.addColorStop(0.5, '#f4e2c0');
+        cg.addColorStop(1, '#ecd3a6');
       }
-      ctx.fillStyle = 'rgba(255,248,230,0.55)';
+      ctx.fillStyle = cg; path(); ctx.fill();
+      ctx.strokeStyle = soup === 'tomaat' ? 'rgba(115,25,12,0.8)' : 'rgba(160,115,60,0.7)'; ctx.lineWidth = 0.012; ctx.stroke();
+      ctx.clip();
+      if (soup === 'tomaat') {
+        ctx.fillStyle = 'rgba(255,226,150,0.85)';
+        for (let i = 0; i < 4; i++) {
+          const a = i * 1.7 + c.tone * 3;
+          ctx.beginPath(); ctx.ellipse(Math.cos(a) * c.r * 0.35, Math.sin(a) * c.r * 0.3, c.r * 0.09, c.r * 0.05, a, 0, TAU); ctx.fill();
+        }
+      } else {
+        ctx.strokeStyle = 'rgba(170,125,70,0.4)'; ctx.lineWidth = 0.008;
+        for (let i = -3; i <= 3; i++) {
+          ctx.beginPath(); ctx.moveTo(-c.r * 1.2, i * c.r * 0.28 - c.r * 0.15); ctx.quadraticCurveTo(0, i * c.r * 0.28 + c.r * 0.1, c.r * 1.2, i * c.r * 0.28 - c.r * 0.05); ctx.stroke();
+        }
+      }
+      ctx.fillStyle = soup === 'tomaat' ? 'rgba(255,225,210,0.55)' : 'rgba(255,248,230,0.55)';
       ctx.beginPath(); ctx.ellipse(-c.r * 0.25, -c.r * 0.25, c.r * 0.4, c.r * 0.2, -0.5, 0, TAU); ctx.fill();
       ctx.restore();
     }
 
-    // peterselie
-    for (const p of parsley) {
+    // peterselie (kip) of basilicum (tomaat)
+    for (const p of soup === 'tomaat' ? parsley : []) {
+      ctx.save();
+      ctx.translate(p.x, -p.y * k + bob); ctx.scale(1, -k); ctx.rotate(p.th);
+      const leaf = () => {
+        ctx.beginPath();
+        ctx.moveTo(-p.r, 0);
+        ctx.quadraticCurveTo(-p.r * 0.1, p.r * 0.75, p.r * 1.05, 0);
+        ctx.quadraticCurveTo(-p.r * 0.1, -p.r * 0.75, -p.r, 0);
+        ctx.closePath();
+      };
+      ctx.fillStyle = '#1f5a1a'; ctx.save(); ctx.translate(0, -0.012); leaf(); ctx.fill(); ctx.restore();
+      const lg = ctx.createLinearGradient(-p.r, -p.r * 0.5, p.r, p.r * 0.5);
+      lg.addColorStop(0, p.tone > 0.5 ? '#4f9a35' : '#3f8a2c'); lg.addColorStop(1, '#2f7a28');
+      ctx.fillStyle = lg; leaf(); ctx.fill();
+      ctx.strokeStyle = 'rgba(190,230,150,0.7)'; ctx.lineWidth = 0.006;
+      ctx.beginPath(); ctx.moveTo(-p.r * 0.9, 0); ctx.lineTo(p.r * 0.9, 0); ctx.stroke();
+      for (const sgn of [-1, 1]) for (let i = 1; i <= 2; i++) {
+        ctx.beginPath(); ctx.moveTo(-p.r * 0.5 + i * p.r * 0.4, 0); ctx.lineTo(-p.r * 0.2 + i * p.r * 0.4, sgn * p.r * 0.32); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    for (const p of soup === 'tomaat' ? [] : parsley) {
       ctx.save();
       ctx.translate(p.x, -p.y * k + bob); ctx.scale(1, -k); ctx.rotate(p.th);
       ctx.fillStyle = p.tone > 0.5 ? '#4f9a35' : '#3f8a2c';
@@ -719,12 +800,18 @@
       ctx.restore();
     }
 
+    // peperkorreltjes
+    ctx.fillStyle = 'rgba(40,24,18,0.85)';
+    for (const p of pepper) {
+      ctx.beginPath(); ctx.ellipse(p.x, -p.y * k + bob, p.r, p.r * k, 0, 0, TAU); ctx.fill();
+    }
+
     // vetoogjes
     ctx.lineWidth = 0.0045;
     for (const e of eyes) {
       const X = e.x, Y = -e.y * k + bob;
-      ctx.fillStyle = 'rgba(255,236,160,0.2)';
-      ctx.strokeStyle = 'rgba(255,248,215,0.6)';
+      ctx.fillStyle = soup === 'tomaat' ? 'rgba(255,178,92,0.26)' : 'rgba(255,236,160,0.2)';
+      ctx.strokeStyle = soup === 'tomaat' ? 'rgba(255,214,160,0.7)' : 'rgba(255,248,215,0.6)';
       ctx.beginPath(); ctx.ellipse(X, Y, e.r, e.r * k, 0, 0, TAU); ctx.fill(); ctx.stroke();
       if (e.r > 0.014) {
         ctx.fillStyle = 'rgba(255,255,255,0.65)';
@@ -1005,11 +1092,28 @@
 
   // ---------------------------------------------------------------- start
   craquele = makeCraquele();
-  textTex = makeTextTexture();
+  textTex = makeTextTexture('kip');
   steamSprite = makeSprite(128, [[0, 'rgba(255,252,246,0.95)'], [0.45, 'rgba(255,250,242,0.45)'], [1, 'rgba(255,250,242,0)']]);
   breathSprite = makeSprite(128, [[0, 'rgba(235,244,255,1)'], [0.5, 'rgba(225,238,255,0.5)'], [1, 'rgba(225,238,255,0)']]);
-  buildSoup();
+  buildSoup('kip');
   layout();
+
+  function setSoup(kind, fromHash) {
+    if (kind !== 'kip' && kind !== 'tomaat') kind = 'kip';
+    if (kind === soup && !fromHash) return;
+    soup = kind;
+    buildSoup(kind);
+    textTex = makeTextTexture(kind);
+    ripples.length = 0;
+    flowStrength = 0; breathStrength = 0; holding = false; blowUntil = 0;
+    const name = kind === 'tomaat' ? 'Tomatensoep' : 'Kippensoep';
+    document.title = name;
+    document.getElementById('soup-title').textContent = name;
+    for (const b of document.querySelectorAll('.soup-btn')) b.setAttribute('aria-pressed', String(b.dataset.soup === kind));
+    try { history.replaceState(null, '', kind === 'tomaat' ? '#tomaat' : location.pathname + location.search); } catch (_) { /* niet erg */ }
+  }
+  for (const b of document.querySelectorAll('.soup-btn')) b.addEventListener('click', () => setSoup(b.dataset.soup));
+  if (location.hash === '#tomaat') setSoup('tomaat', true);
 
   let last = performance.now();
   function frame(now) {
@@ -1028,6 +1132,6 @@
     field,
     simulate(sec, step = 1 / 60) { for (let t = 0; t < sec; t += step) update(step); render(); },
     blowFor(sec) { if (!btnBlow.disabled) { holding = false; blowUntil = clock + sec; } },
-    setNear,
+    setNear, setSoup,
   };
 })();
