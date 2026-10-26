@@ -5,15 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f1dcbc">
   <title>Kippensoep</title>
-  <meta name="description" content="Een kom kippensoep: haal hem dichterbij, blaas erin en kijk hoe de soep door de kom stroomt.">
+  <meta name="description" content="Een kom kippen- of tomatensoep: haal hem dichterbij, blaas erin en kijk hoe de soep door de kom stroomt.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E%F0%9F%8D%B2%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="scene" aria-label="Een kom kippensoep die je vasthoudt"></canvas>
+  <canvas id="scene" aria-label="Een kom soep die je vasthoudt"></canvas>
 
   <header class="top">
-    <h1>Kippensoep</h1>
+    <h1 id="soup-title" class="sr-only">Kippensoep</h1>
+    <div class="soups" role="group" aria-label="Soort soep">
+      <button class="soup-btn" type="button" data-soup="kip" aria-pressed="true">Kippensoep</button>
+      <button class="soup-btn" type="button" data-soup="tomaat" aria-pressed="false">Tomatensoep</button>
+    </div>
     <p id="hint" aria-live="polite">Haal de kom dichterbij om erin te kunnen blazen.</p>
   </header>
 

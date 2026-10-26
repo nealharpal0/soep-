@@ -37,6 +37,33 @@ html, body {
   text-align: center;
   pointer-events: none;
 }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.soups {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 28px;
+  background: rgba(255,255,255,.6);
+  box-shadow: 0 2px 8px rgba(80,40,0,.12);
+  pointer-events: auto;
+}
+.soup-btn {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 650;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background .2s, color .2s;
+}
+.soup-btn[aria-pressed="true"] { background: var(--amber); color: #fff; }
+.soup-btn[data-soup="tomaat"][aria-pressed="true"] { background: #c7392a; }
+.soup-btn:focus-visible { outline: 3px solid #1b4fd8; outline-offset: 2px; }
 .top h1 {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
@@ -157,7 +184,7 @@ html, body {
 .switch input:checked + .track::after { transform: translateX(22px); }
 
 @media (max-width: 560px) {
-  .top h1 { font-size: 22px; }
+  .soup-btn { padding: 0 14px; font-size: 15px; }
   .panel { gap: 8px; }
   .btn { flex: 1 1 calc(50% - 8px); min-width: 0; padding: 0 12px; font-size: 17px; }
   .switch { flex: 1 1 100%; justify-content: center; min-height: 48px; }

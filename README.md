@@ -1,14 +1,21 @@
-# Kippensoep 🍲
+# Kippensoep & tomatensoep 🍲
 
-Een interactieve animatie van iemand die een kom kippensoep vasthoudt, de kom dichter naar zich toe haalt en erin blaast. Daarna stroomt de soep in een vast patroon door de kom.
+Een interactieve animatie van iemand die een kom soep vasthoudt, de kom dichter naar zich toe haalt en erin blaast. Daarna stroomt de soep in een vast patroon door de kom. Je kunt schakelen tussen **kippensoep** en **tomatensoep**.
 
-**Live:** https://nealharpal0.github.io/soep-/
+**Live:** https://nealharpal0.github.io/soep-/  
+Direct tomatensoep: https://nealharpal0.github.io/soep-/#tomaat
 
 ## Bedienen
 
+- **Kippensoep / Tomatensoep** – bovenin schakel je tussen de twee soepen. De stroming is bij beide hetzelfde.
 - **Dichterbij houden** – de kom komt vloeiend naar je toe en kantelt, zodat je er bijna van bovenaf in kijkt. Dezelfde knop heet dan **Terug**.
 - **Blazen** (alleen als de kom dichtbij is) – één klik is één keer blazen (±2,6 s), ingedrukt houden is blijven blazen. De ademwolk gaat van onderen naar de blaasplek, duwt de stoom weg en maakt rimpelingen. Na het blazen loopt de stroming in een paar seconden uit.
 - **Toon stroming** – tekent rode stroomlijnen met pijlen over de soep en het blauwe punt waar geblazen wordt.
+
+## De soepen
+
+- **Kippensoep:** heldere gouden bouillon met vermicelli, kip, wortel, prei, selderij, peterselie en vetoogjes.
+- **Tomatensoep:** rode tomatensoep met roomstrepen, tomatenstukjes, croutons, basilicum, peper en olie-oogjes.
 
 ## Stromingspatroon
 
@@ -23,7 +30,7 @@ Van bovenaf gezien (x naar rechts, y van de kijker af, in een eenheidscirkel) ge
 - Aan de kant van de kijker komen beide stromen samen bij de blaasplek en worden weer naar voren geduwd.
 - Twee tegengesteld draaiende wervels (links tegen de klok in, rechts met de klok mee), met de centra op (±0,58; 0).
 
-Dit veld wordt op de perspectiefellips van het soepoppervlak geprojecteerd. Noedels, kip, wortel, prei, selderij, peterselie en ruim driehonderd vetoogjes bewegen ermee mee (noedels draaien mee met de wervelsterkte) en blijven binnen de kom. Een beetje ruis voorkomt dat iets blijft hangen bij de stilstandspunten voor en achter.
+Dit veld wordt op de perspectiefellips van het soepoppervlak geprojecteerd. Alle ingrediënten en vetoogjes bewegen ermee mee (stukjes en strepen draaien mee met de wervelsterkte) en blijven binnen de kom. Een beetje ruis voorkomt dat iets blijft hangen bij de stilstandspunten voor en achter.
 
 ## Techniek
 
